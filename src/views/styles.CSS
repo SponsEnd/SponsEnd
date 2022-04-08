@@ -90,7 +90,6 @@ body, p {
     margin: 10px;
     padding: 20px;
     border-radius: 20px;
-    border: 3px solid rgb(255, 135, 66);
   }
   nav{
   position: fixed;
@@ -104,6 +103,11 @@ body, p {
   min-height: 60px;
 }
 
+.tg{
+  font-family : 'PT Sans Narrow';
+  text-align: justify;
+  text-justify: inter-word;
+}
 .navbar-logo{
 	padding: 15px;
 	color: #fff;
