@@ -15,6 +15,12 @@ html {
     color: white;
   }
 
+.sponstext{
+  background: rgba(0, 0, 0, 0.356);
+  margin: 10px;
+  padding: 20px;
+  border-radius: 20px;
+}
 
 body{
     background-image: url("bg.PNG");
@@ -86,6 +92,34 @@ body, p {
     padding: 20px;
    
   }
+
+  .scrollb{
+    margin-left: 30px;
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    width: 250px;
+    height: 470px;
+    overflow: scroll;
+  }
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 0px;
+    }
+    
+    ::-webkit-scrollbar-track {
+    border: 1px solid rgb(230, 24, 24);
+    border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+    background: rgb(230, 24, 24);  
+    border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+    background: rgb(255, 116, 116);  
+    }
   .bubs1{
     margin: 10px;
     padding: 20px;
