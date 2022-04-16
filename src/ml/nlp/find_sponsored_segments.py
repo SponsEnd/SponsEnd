@@ -41,7 +41,7 @@ class Doc2VecTransformer(BaseEstimator):
 
 
 def check_sponsor(data):
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('src/ml/nlp/data.csv')
     df = df.drop(columns = ['Unnamed: 0'])
 
 
@@ -95,6 +95,8 @@ def check_sponsor(data):
     dv = doc2vec_tr.transform(data)
     pv = auto_encoder.predict(dv)
 
+    sponsored_segments = []
+
     from scipy.spatial.distance import cosine
 
     def key_consine_similarity(tupple):
@@ -117,17 +119,23 @@ def check_sponsor(data):
             tag = ''
             if cosine_sim_val > 0.70:
                 tag='Sponsored'
+                sponsored_segments.append({"text": data.iloc[index][0], "tag": tag}) 
             else:
                 tag='Content'
             print('Tag :', cosine_sim_val, tag)
             print('---------------------------------')
+
     
     sorted_cosine_similarities = get_computed_similarities(vectors=dv, predicted_vectors=pv)
     display_top_n(sorted_cosine_similarities=sorted_cosine_similarities)
 
+    # print(sponsored_segments)
+    return sponsored_segments
+
 def find_sponsored_segments(captions):
     sentences = captions.split(".")
     sentences = ['todays video is sponsored by skillshare. Back to the video.','So my friend told me about her problems and I gave her some advice storytime','this video is sponsored by best fiends. it is a mobile multiplayer game that keeps you engaged.','i am a mukbang youtuber',"thank you raycon for sponsoring today's video",'we will be discussing this exam paper from Indias joint entrance exam','Use my coupon code EATMISS to get flat 30% off your first three purchases']
-    check_sponsor(sentences)
 
-find_sponsored_segments("a. b")
+    sponsored_segments = check_sponsor(sentences)
+
+# find_sponsored_segments("a. b")
