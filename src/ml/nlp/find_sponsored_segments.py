@@ -13,11 +13,31 @@ from tqdm import tqdm
 import multiprocessing
 import numpy as np
 
-def find_sponsored_segments(captions):
-    sentences = captions.split(".")
-    sentences = ['todays video is sponsored by skillshare. Back to the video.','So my friend told me about her problems and I gave her some advice storytime','this video is sponsored by best fiends. it is a mobile multiplayer game that keeps you engaged.','i am a mukbang youtuber',"thank you raycon for sponsoring today's video",'we will be discussing this exam paper from Indias joint entrance exam','Use my coupon code EATMISS to get flat 30% off your first three purchases']
-    check_sponsor(sentences)
 
+class Doc2VecTransformer(BaseEstimator):
+
+    def __init__(self, vector_size=100, learning_rate=0.02, epochs=20):
+        self.learning_rate = learning_rate
+        self.epochs = epochs
+        self._model = None
+        self.vector_size = vector_size
+        self.workers = multiprocessing.cpu_count() - 1
+
+    def fit(self, df_x, df_y=None):
+        tagged_x = [TaggedDocument(str(row['sents']).split(), [index]) for index, row in df_x.iterrows()]
+        model = Doc2Vec(documents=tagged_x, vector_size=self.vector_size, workers=self.workers)
+
+        for epoch in range(self.epochs):
+            model.train(skl_utils.shuffle([x for x in tqdm(tagged_x)]), total_examples=len(tagged_x), epochs=1)
+            model.alpha -= self.learning_rate
+            model.min_alpha = model.alpha
+
+        self._model = model
+        return self
+
+    def transform(self, df_x):
+        return np.asmatrix(np.array([self._model.infer_vector(str(row['sents']).split())
+                                     for index, row in df_x.iterrows()]))
 
 
 def check_sponsor(data):
@@ -99,34 +119,15 @@ def check_sponsor(data):
                 tag='Sponsored'
             else:
                 tag='Content'
-                print('Tag :', cosine_sim_val, tag)
-                print('---------------------------------')
+            print('Tag :', cosine_sim_val, tag)
+            print('---------------------------------')
     
     sorted_cosine_similarities = get_computed_similarities(vectors=dv, predicted_vectors=pv)
     display_top_n(sorted_cosine_similarities=sorted_cosine_similarities)
 
+def find_sponsored_segments(captions):
+    sentences = captions.split(".")
+    sentences = ['todays video is sponsored by skillshare. Back to the video.','So my friend told me about her problems and I gave her some advice storytime','this video is sponsored by best fiends. it is a mobile multiplayer game that keeps you engaged.','i am a mukbang youtuber',"thank you raycon for sponsoring today's video",'we will be discussing this exam paper from Indias joint entrance exam','Use my coupon code EATMISS to get flat 30% off your first three purchases']
+    check_sponsor(sentences)
 
-class Doc2VecTransformer(BaseEstimator):
-
-    def __init__(self, vector_size=100, learning_rate=0.02, epochs=20):
-        self.learning_rate = learning_rate
-        self.epochs = epochs
-        self._model = None
-        self.vector_size = vector_size
-        self.workers = multiprocessing.cpu_count() - 1
-
-    def fit(self, df_x, df_y=None):
-        tagged_x = [TaggedDocument(str(row['sents']).split(), [index]) for index, row in df_x.iterrows()]
-        model = Doc2Vec(documents=tagged_x, vector_size=self.vector_size, workers=self.workers)
-
-        for epoch in range(self.epochs):
-            model.train(skl_utils.shuffle([x for x in tqdm(tagged_x)]), total_examples=len(tagged_x), epochs=1)
-            model.alpha -= self.learning_rate
-            model.min_alpha = model.alpha
-
-        self._model = model
-        return self
-
-    def transform(self, df_x):
-        return np.asmatrix(np.array([self._model.infer_vector(str(row['sents']).split())
-                                     for index, row in df_x.iterrows()]))
+find_sponsored_segments("a. b")
