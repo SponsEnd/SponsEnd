@@ -25,7 +25,8 @@ html {
 body{
     background-image: url("bg.PNG");
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-size: cover;
+    background-attachment:fixed;
 }
 body, p { 
     padding: 0; 
