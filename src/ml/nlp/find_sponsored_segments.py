@@ -96,6 +96,7 @@ def check_sponsor(data):
     pv = auto_encoder.predict(dv)
 
     sponsored_segments = []
+    cos_sim = 0
 
     from scipy.spatial.distance import cosine
 
@@ -123,19 +124,43 @@ def check_sponsor(data):
             else:
                 tag='Content'
             print('Tag :', cosine_sim_val, tag)
+            cosine_sim_val
             print('---------------------------------')
+            return cosine_sim_val
 
     
     sorted_cosine_similarities = get_computed_similarities(vectors=dv, predicted_vectors=pv)
-    display_top_n(sorted_cosine_similarities=sorted_cosine_similarities)
+    cos_sim = display_top_n(sorted_cosine_similarities=sorted_cosine_similarities)
 
     # print(sponsored_segments)
-    return sponsored_segments
+    return cos_sim
 
 def find_sponsored_segments(captions):
-    sentences = captions.split(".")
-    sentences = ['todays video is sponsored by skillshare. Back to the video.','So my friend told me about her problems and I gave her some advice storytime','this video is sponsored by best fiends. it is a mobile multiplayer game that keeps you engaged.','i am a mukbang youtuber',"thank you raycon for sponsoring today's video",'we will be discussing this exam paper from Indias joint entrance exam','Use my coupon code EATMISS to get flat 30% off your first three purchases']
+    # sentences = captions
+    sponsored_segments = []
+    limit = 2
+    index = 0
+    for sentence in captions:
+        if index < limit:
+            print(sentence["text"])
+            cosine_similarity = check_sponsor([sentence["text"]])
+            print("Output: ", cosine_similarity)
+            if cosine_similarity >= 0.8:
+                print(sentence["text"])
+                sponsored_segments.append(
+                    {
+                        "text": sentence["text"], 
+                        "start": sentence["start"],
+                        "duration": sentence["duration"],
+                        "end": float(sentence["start"]) + float(sentence["duration"])
+                    }
+                )
+            print(sponsored_segments)
+            index += 1
+    return str(sponsored_segments)
 
-    sponsored_segments = check_sponsor(sentences)
+    # sentences = ['todays video is sponsored by skillshare. Back to the video.','So my friend told me about her problems and I gave her some advice storytime','this video is sponsored by best fiends. it is a mobile multiplayer game that keeps you engaged.','i am a mukbang youtuber',"thank you raycon for sponsoring today's video",'we will be discussing this exam paper from Indias joint entrance exam','Use my coupon code EATMISS to get flat 30% off your first three purchases']
+
+    # sponsored_segments = check_sponsor(sentences)
 
 # find_sponsored_segments("a. b")
